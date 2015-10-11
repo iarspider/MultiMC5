@@ -23,7 +23,6 @@
 #include "InstanceList.h"
 #include "auth/MojangAccountList.h"
 #include "icons/IconList.h"
-#include "minecraft/LwjglVersionList.h"
 #include "minecraft/MinecraftVersionList.h"
 #include "liteloader/LiteLoaderVersionList.h"
 
@@ -551,16 +550,6 @@ void MultiMC::initGlobalSettings(bool test_mode)
 		m_globalSettingsProvider->addPage<AccountListPage>();
 		m_globalSettingsProvider->addPage<PasteEEPage>();
 	}
-}
-
-std::shared_ptr<LWJGLVersionList> MultiMC::lwjgllist()
-{
-	if (!m_lwjgllist)
-	{
-		m_lwjgllist.reset(new LWJGLVersionList());
-		ENV.registerVersionList("org.lwjgl.legacy", m_lwjgllist);
-	}
-	return m_lwjgllist;
 }
 
 std::shared_ptr<ForgeVersionList> MultiMC::forgelist()

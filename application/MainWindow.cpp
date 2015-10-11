@@ -353,7 +353,6 @@ namespace Ui {
 
 #include "InstanceList.h"
 #include "minecraft/MinecraftVersionList.h"
-#include "minecraft/LwjglVersionList.h"
 #include "icons/IconList.h"
 #include "java/JavaVersionList.h"
 
@@ -579,10 +578,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 		{
 			m_versionLoadTask = MMC->minecraftlist()->getLoadTask();
 			startTask(m_versionLoadTask);
-		}
-		if (!MMC->lwjgllist()->isLoaded())
-		{
-			MMC->lwjgllist()->loadList();
 		}
 
 		m_newsChecker->reloadNews();

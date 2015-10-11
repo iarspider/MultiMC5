@@ -81,7 +81,6 @@ public:
 
 MinecraftVersionList::MinecraftVersionList(QObject *parent) : BaseVersionList(parent)
 {
-	loadBuiltinList();
 	loadCachedList();
 }
 
@@ -149,67 +148,6 @@ void MinecraftVersionList::loadCachedList()
 		return;
 	}
 	m_hasLocalIndex = true;
-}
-
-void MinecraftVersionList::loadBuiltinList()
-{
-	qDebug() << "Loading builtin version list.";
-	// grab the version list data from internal resources.
-	const QJsonDocument doc =
-		Json::requireDocument(QString(":/versions/minecraft.json"), "builtin version list");
-	const QJsonObject root = doc.object();
-
-	// parse all the versions
-	for (const auto version : Json::requireArray(root.value("versions")))
-	{
-		QJsonObject versionObj = version.toObject();
-		QString versionID = versionObj.value("id").toString("");
-		QString versionTypeStr = versionObj.value("type").toString("");
-		if (versionID.isEmpty() || versionTypeStr.isEmpty())
-		{
-			qCritical() << "Parsed version is missing ID or type";
-			continue;
-		}
-
-		if (g_VersionFilterData.legacyBlacklist.contains(versionID))
-		{
-			qWarning() << "Blacklisted legacy version ignored: " << versionID;
-			continue;
-		}
-
-		// Now, we construct the version object and add it to the list.
-		std::shared_ptr<MinecraftVersion> mcVersion(new MinecraftVersion());
-		mcVersion->m_name = mcVersion->m_descriptor = versionID;
-
-		// Parse the timestamp.
-		if (!parse_timestamp(versionObj.value("releaseTime").toString(""),
-							 mcVersion->m_releaseTimeString, mcVersion->m_releaseTime))
-		{
-			qCritical() << "Error while parsing version" << versionID
-						 << ": invalid version timestamp";
-			continue;
-		}
-
-		// Get the download URL.
-		mcVersion->download_url =
-			"http://" + URLConstants::AWS_DOWNLOAD_VERSIONS + versionID + "/";
-
-		mcVersion->m_versionSource = Builtin;
-		mcVersion->m_type = versionTypeStr;
-		mcVersion->m_appletClass = versionObj.value("appletClass").toString("");
-		mcVersion->m_mainClass = versionObj.value("mainClass").toString("");
-		mcVersion->m_jarChecksum = versionObj.value("checksum").toString("");
-		mcVersion->m_processArguments = versionObj.value("processArguments").toString("legacy");
-		if (versionObj.contains("+traits"))
-		{
-			for (auto traitVal : Json::requireArray(versionObj.value("+traits")))
-			{
-				mcVersion->m_traits.insert(Json::requireString(traitVal));
-			}
-		}
-		m_lookup[versionID] = mcVersion;
-		m_vlist.append(mcVersion);
-	}
 }
 
 void MinecraftVersionList::loadMojangList(QJsonDocument jsonDoc, VersionSource source)
@@ -283,11 +221,6 @@ void MinecraftVersionList::loadMojangList(QJsonDocument jsonDoc, VersionSource s
 		{
 			qCritical() << "Error while parsing version" << versionID
 						 << ": invalid update timestamp";
-			continue;
-		}
-
-		if (mcVersion->m_releaseTime < g_VersionFilterData.legacyCutoffDate)
-		{
 			continue;
 		}
 
@@ -651,10 +584,6 @@ void MinecraftVersionList::finalizeUpdate(QString version)
 	}
 
 	auto updatedVersion = std::dynamic_pointer_cast<MinecraftVersion>(m_vlist[idx]);
-
-	// reject any updates to builtin versions.
-	if (updatedVersion->m_versionSource == Builtin)
-		return;
 
 	// if we have an update for the version, replace it, make the update local
 	if (updatedVersion->upstreamUpdate)

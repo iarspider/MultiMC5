@@ -1,6 +1,5 @@
 #include "FTBPlugin.h"
 #include "FTBVersion.h"
-#include "LegacyFTBInstance.h"
 #include "OneSixFTBInstance.h"
 #include <BaseInstance.h>
 #include <icons/IconList.h>
@@ -143,11 +142,7 @@ InstancePtr loadInstance(SettingsObjectPtr globalSettings, QMap<QString, QString
 	qDebug() << "Loading existing " << record.name;
 
 	QString inst_type = m_settings->get("InstanceType").toString();
-	if (inst_type == "LegacyFTB")
-	{
-		inst.reset(new LegacyFTBInstance(globalSettings, m_settings, record.instanceDir));
-	}
-	else if (inst_type == "OneSixFTB")
+	if (inst_type == "OneSixFTB")
 	{
 		inst.reset(new OneSixFTBInstance(globalSettings, m_settings, record.instanceDir));
 	}
@@ -209,16 +204,9 @@ InstancePtr createInstance(SettingsObjectPtr globalSettings, QMap<QString, QStri
 	auto m_settings = std::make_shared<INISettingsObject>(FS::PathCombine(record.instanceDir, "instance.cfg"));
 	m_settings->registerSetting("InstanceType", "Legacy");
 
-	if (mcVersion->usesLegacyLauncher())
-	{
-		m_settings->set("InstanceType", "LegacyFTB");
-		inst.reset(new LegacyFTBInstance(globalSettings, m_settings, record.instanceDir));
-	}
-	else
-	{
-		m_settings->set("InstanceType", "OneSixFTB");
-		inst.reset(new OneSixFTBInstance(globalSettings, m_settings, record.instanceDir));
-	}
+	m_settings->set("InstanceType", "OneSixFTB");
+	inst.reset(new OneSixFTBInstance(globalSettings, m_settings, record.instanceDir));
+
 	// initialize
 	{
 		SettingsObject::Lock lock(inst->settings());

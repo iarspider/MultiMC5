@@ -157,12 +157,6 @@ set(LOGIC_SOURCES
 	minecraft/OneSixUpdate.cpp
 	minecraft/OneSixInstance.h
 	minecraft/OneSixInstance.cpp
-	minecraft/LegacyUpdate.h
-	minecraft/LegacyUpdate.cpp
-	minecraft/LegacyInstance.h
-	minecraft/LegacyInstance.cpp
-	minecraft/LwjglVersionList.h
-	minecraft/LwjglVersionList.cpp
 	minecraft/SkinUtils.h
 	minecraft/SkinUtils.cpp
 	minecraft/GradleSpecifier.h
@@ -211,8 +205,6 @@ set(LOGIC_SOURCES
 	# FTB
 	ftb/OneSixFTBInstance.h
 	ftb/OneSixFTBInstance.cpp
-	ftb/LegacyFTBInstance.h
-	ftb/LegacyFTBInstance.cpp
 	ftb/FTBProfileStrategy.h
 	ftb/FTBProfileStrategy.cpp
 	ftb/FTBPlugin.h

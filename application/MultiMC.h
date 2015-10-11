@@ -76,7 +76,6 @@ public:
 	}
 
 	std::shared_ptr<MinecraftVersionList> minecraftlist();
-	std::shared_ptr<LWJGLVersionList> lwjgllist();
 	std::shared_ptr<ForgeVersionList> forgelist();
 	std::shared_ptr<LiteLoaderVersionList> liteloaderlist();
 	std::shared_ptr<JavaVersionList> javalist();

@@ -32,7 +32,6 @@
 
 //FIXME: this really doesn't belong *here*
 #include "minecraft/OneSixInstance.h"
-#include "minecraft/LegacyInstance.h"
 #include "minecraft/MinecraftVersion.h"
 #include "settings/INISettingsObject.h"
 #include "ftb/FTBPlugin.h"
@@ -436,10 +435,6 @@ InstanceList::loadInstance(InstancePtr &inst, const QString &instDir)
 	if (inst_type == "OneSix" || inst_type == "Nostalgia")
 	{
 		inst.reset(new OneSixInstance(m_globalSettings, instanceSettings, instDir));
-	}
-	else if (inst_type == "Legacy")
-	{
-		inst.reset(new LegacyInstance(m_globalSettings, instanceSettings, instDir));
 	}
 	else
 	{

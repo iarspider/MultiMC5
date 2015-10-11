@@ -14,12 +14,6 @@ set(SRC
 	org/simplericity/macify/eawt/ApplicationListener.java
 	org/simplericity/macify/eawt/DefaultApplication.java
 
-	# legacy applet wrapper thing.
-	# The launcher has to be there for silly FML/Forge relauncher.
-	net/minecraft/Launcher.java
-	org/multimc/legacy/LegacyLauncher.java
-	org/multimc/LegacyFrame.java
-
 	# onesix launcher
 	org/multimc/onesix/OneSixLauncher.java
 

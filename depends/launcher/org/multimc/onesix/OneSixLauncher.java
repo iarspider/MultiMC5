@@ -36,7 +36,6 @@ public class OneSixLauncher implements Launcher
 	private List<String> jarmods;
 	private List<String> coremods;
 	private List<String> traits;
-	private String appletClass;
 	private String mainClass;
 	private String natives;
 	private String userName, sessionId;
@@ -44,8 +43,6 @@ public class OneSixLauncher implements Launcher
 	private String windowParams;
 
 	// secondary parameters
-	private Dimension winSize;
-	private boolean maximize;
 	private String cwd;
 
 	// the much abused system classloader, for convenience (for further abuse)
@@ -57,7 +54,6 @@ public class OneSixLauncher implements Launcher
 		extlibs = params.all("ext");
 		mcparams = params.allSafe("param", new ArrayList<String>() );
 		mainClass = params.firstSafe("mainClass", "net.minecraft.client.Minecraft");
-		appletClass = params.firstSafe("appletClass", "net.minecraft.client.MinecraftApplet");
 		mods = params.allSafe("mod", new ArrayList<String>());
 		jarmods = params.allSafe("jarmod", new ArrayList<String>());
 		coremods = params.allSafe("coremod", new ArrayList<String>());
@@ -66,26 +62,8 @@ public class OneSixLauncher implements Launcher
 
 		userName = params.first("userName");
 		sessionId = params.first("sessionId");
-		windowTitle = params.firstSafe("windowTitle", "Minecraft");
-		windowParams = params.firstSafe("windowParams", "854x480");
 
 		cwd = System.getProperty("user.dir");
-		winSize = new Dimension(854, 480);
-		maximize = false;
-
-		String[] dimStrings = windowParams.split("x");
-
-		if (windowParams.equalsIgnoreCase("max"))
-		{
-			maximize = true;
-		}
-		else if (dimStrings.length == 2)
-		{
-			try
-			{
-				winSize = new Dimension(Integer.parseInt(dimStrings[0]), Integer.parseInt(dimStrings[1]));
-			} catch (NumberFormatException ignored) {}
-		}
 	}
 
 	private void printStats()
@@ -150,88 +128,10 @@ public class OneSixLauncher implements Launcher
 		Utils.log("Params:");
 		Utils.log("  " + mcparams.toString());
 		Utils.log();
-		if(maximize)
-			Utils.log("Window size: max (if available)");
-		else
-			Utils.log("Window size: " + Integer.toString(winSize.width) + " x " + Integer.toString(winSize.height));
-		Utils.log();
-	}
-
-	int legacyLaunch()
-	{
-		// Get the Minecraft Class and set the base folder
-		Class<?> mc;
-		try
-		{
-			mc = cl.loadClass(mainClass);
-
-			Field f = Utils.getMCPathField(mc);
-
-			if (f == null)
-			{
-				System.err.println("Could not find Minecraft path field.");
-			}
-			else
-			{
-				f.setAccessible(true);
-				f.set(null, new File(cwd));
-			}
-		} catch (Exception e)
-		{
-			System.err.println("Could not set base folder. Failed to find/access Minecraft main class:");
-			e.printStackTrace(System.err);
-			return -1;
-		}
-
-		System.setProperty("minecraft.applet.TargetDirectory", cwd);
-
-		String[] mcArgs = new String[2];
-		mcArgs[0] = userName;
-		mcArgs[1] = sessionId;
-
-		Utils.log("Launching with applet wrapper...");
-		try
-		{
-			Class<?> MCAppletClass = cl.loadClass(appletClass);
-			Applet mcappl = (Applet) MCAppletClass.newInstance();
-			LegacyFrame mcWindow = new LegacyFrame(windowTitle);
-			mcWindow.start(mcappl, userName, sessionId, winSize, maximize);
-		} catch (Exception e)
-		{
-			Utils.log("Applet wrapper failed:", "Error");
-			e.printStackTrace(System.err);
-			Utils.log();
-			Utils.log("Falling back to compatibility mode.");
-			try
-			{
-				mc.getMethod("main", String[].class).invoke(null, (Object) mcArgs);
-			} catch (Exception e1)
-			{
-				Utils.log("Failed to invoke the Minecraft main class:", "Fatal");
-				e1.printStackTrace(System.err);
-				return -1;
-			}
-		}
-		return 0;
 	}
 
 	int launchWithMainClass()
 	{
-		// window size, title and state, onesix
-		if (maximize)
-		{
-			// FIXME: there is no good way to maximize the minecraft window in onesix.
-			// the following often breaks linux screen setups
-			// mcparams.add("--fullscreen");
-		}
-		else
-		{
-			mcparams.add("--width");
-			mcparams.add(Integer.toString(winSize.width));
-			mcparams.add("--height");
-			mcparams.add(Integer.toString(winSize.height));
-		}
-
 		// Get the Minecraft Class.
 		Class<?> mc;
 		try
@@ -383,15 +283,7 @@ public class OneSixLauncher implements Launcher
 		// grab the system classloader and ...
 		cl = ClassLoader.getSystemClassLoader();
 
-		if (traits.contains("legacyLaunch") || traits.contains("alphaLaunch") )
-		{
-			// legacy launch uses the applet wrapper
-			return legacyLaunch();
-		}
-		else
-		{
-			// normal launch just calls main()
-			return launchWithMainClass();
-		}
+		// normal launch just calls main()
+		return launchWithMainClass();
 	}
 }
