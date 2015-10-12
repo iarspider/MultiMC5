@@ -88,7 +88,6 @@ set(QUAZIP_LIBRARIES -L"${CMAKE_BINARY_DIR}/External/Install/QuaZIP/lib" quazip)
 endif()
 
 add_subdirectory(depends/hoedown) # markdown parser
-add_subdirectory(depends/launcher) # java based launcher part for Minecraft
 add_subdirectory(depends/javacheck) # java compatibility checker
 add_subdirectory(depends/xz-embedded) # xz compression
 add_subdirectory(depends/pack200) # java pack200 compression

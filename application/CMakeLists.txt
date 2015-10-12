@@ -382,7 +382,6 @@ endif()
 
 #### Java bits ####
 install_jar(JavaCheck "${BINARY_DEST_DIR}/jars")
-install_jar(NewLaunch "${BINARY_DEST_DIR}/jars")
 
 #### Dist package logic ####
 

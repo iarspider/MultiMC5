@@ -122,7 +122,6 @@ public: /* data */
 	// QMap<QString, QString> requirements;
 	QString id;
 	QString mainClass;
-	QString appletClass;
 	QString overwriteMinecraftArguments;
 	QString addMinecraftArguments;
 	QString removeMinecraftArguments;

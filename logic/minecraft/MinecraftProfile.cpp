@@ -70,7 +70,6 @@ void MinecraftProfile::clear()
 	minecraftArguments.clear();
 	minimumLauncherVersion = 0xDEADBEAF;
 	mainClass.clear();
-	appletClass.clear();
 	libraries.clear();
 	tweakers.clear();
 	jarMods.clear();

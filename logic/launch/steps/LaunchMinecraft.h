@@ -31,16 +31,33 @@ public:
 		return true;
 	}
 	void setWorkingDirectory(const QString &wd);
-	void setLaunchScript(const QString &ls)
+
+	void setClasspath(const QStringList & classpath)
 	{
-		m_launchScript = ls;
+		m_classpath = classpath;
+	}
+	void setMainclass(const QString & mainclass)
+	{
+		m_mainclass = mainclass;
+	}
+	void setParams(const QStringList & params)
+	{
+		m_params = params;
+	}
+	void setNativePath(const QString & nativePath)
+	{
+		m_nativePath = nativePath;
 	}
 private slots:
 	void on_state(LoggedProcess::State state);
 
 private:
 	LoggedProcess m_process;
-	QString m_command;
-	QString m_launchScript;
+
+	QStringList m_classpath;
+	QString m_mainclass;
+	QStringList m_params;
+	QString m_nativePath;
+
 	bool mayProceed = false;
 };

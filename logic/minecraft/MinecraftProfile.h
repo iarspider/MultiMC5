@@ -165,10 +165,6 @@ public: /* data */
 	 * The main class to load first
 	 */
 	QString mainClass;
-	/**
-	 * The applet class, for some very old minecraft releases
-	 */
-	QString appletClass;
 
 	/// the list of libs - both active and inactive, native and java
 	QList<OneSixLibraryPtr> libraries;

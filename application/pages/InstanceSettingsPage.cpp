@@ -59,13 +59,13 @@ void InstanceSettingsPage::applySettings()
 	m_settings->set("OverrideWindow", window);
 	if (window)
 	{
-		m_settings->set("LaunchMaximized", ui->maximizedCheckBox->isChecked());
+		m_settings->set("LaunchFullscreen", ui->maximizedCheckBox->isChecked());
 		m_settings->set("MinecraftWinWidth", ui->windowWidthSpinBox->value());
 		m_settings->set("MinecraftWinHeight", ui->windowHeightSpinBox->value());
 	}
 	else
 	{
-		m_settings->reset("LaunchMaximized");
+		m_settings->reset("LaunchFullscreen");
 		m_settings->reset("MinecraftWinWidth");
 		m_settings->reset("MinecraftWinHeight");
 	}
@@ -140,7 +140,7 @@ void InstanceSettingsPage::loadSettings()
 
 	// Window Size
 	ui->windowSizeGroupBox->setChecked(m_settings->get("OverrideWindow").toBool());
-	ui->maximizedCheckBox->setChecked(m_settings->get("LaunchMaximized").toBool());
+	ui->maximizedCheckBox->setChecked(m_settings->get("LaunchFullscreen").toBool());
 	ui->windowWidthSpinBox->setValue(m_settings->get("MinecraftWinWidth").toInt());
 	ui->windowHeightSpinBox->setValue(m_settings->get("MinecraftWinHeight").toInt());
 

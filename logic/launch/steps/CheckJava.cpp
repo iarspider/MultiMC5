@@ -47,7 +47,7 @@ void CheckJava::executeTask()
 	}
 	else
 	{
-		emit logLine("Java path is:\n" + m_javaPath + "\n\n", MessageLevel::MultiMC);
+		emit logLine("Java path is:\n  " + m_javaPath + "\n\n", MessageLevel::MultiMC);
 	}
 
 	QFileInfo javaInfo(realJavaPath);

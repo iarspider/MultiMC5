@@ -54,7 +54,7 @@ MinecraftInstance::MinecraftInstance(SettingsObjectPtr globalSettings, SettingsO
 
 	// Window Size
 	auto windowSetting = m_settings->registerSetting("OverrideWindow", false);
-	m_settings->registerOverride(globalSettings->getSetting("LaunchMaximized"), windowSetting);
+	m_settings->registerOverride(globalSettings->getSetting("LaunchFullscreen"), windowSetting);
 	m_settings->registerOverride(globalSettings->getSetting("MinecraftWinWidth"), windowSetting);
 	m_settings->registerOverride(globalSettings->getSetting("MinecraftWinHeight"), windowSetting);
 
@@ -115,7 +115,6 @@ QStringList MinecraftInstance::javaArguments() const
 	}
 
 	args << "-Duser.language=en";
-	args << "-jar" << FS::PathCombine(QCoreApplication::applicationDirPath(), "jars", "NewLaunch.jar");
 
 	return args;
 }

@@ -87,7 +87,6 @@ VersionFilePtr VersionFile::fromJson(const QJsonDocument &doc, const QString &fi
 	readString("id", out->id);
 
 	readString("mainClass", out->mainClass);
-	readString("appletClass", out->appletClass);
 	readString("processArguments", out->processArguments);
 	readString("minecraftArguments", out->overwriteMinecraftArguments);
 	readString("+minecraftArguments", out->addMinecraftArguments);
@@ -202,7 +201,6 @@ QJsonDocument VersionFile::toJson(bool saveOrder)
 	writeString(root, "mcVersion", mcVersion);
 	writeString(root, "id", id);
 	writeString(root, "mainClass", mainClass);
-	writeString(root, "appletClass", appletClass);
 	writeString(root, "processArguments", processArguments);
 	writeString(root, "minecraftArguments", overwriteMinecraftArguments);
 	writeString(root, "+minecraftArguments", addMinecraftArguments);
@@ -282,10 +280,6 @@ void VersionFile::applyTo(MinecraftProfile *version)
 	if (!mainClass.isNull())
 	{
 		version->mainClass = mainClass;
-	}
-	if (!appletClass.isNull())
-	{
-		version->appletClass = appletClass;
 	}
 	if (!processArguments.isNull())
 	{

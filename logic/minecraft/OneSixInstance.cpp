@@ -133,117 +133,36 @@ QStringList OneSixInstance::processMinecraftArgs(AuthSessionPtr session)
 
 std::shared_ptr<LaunchTask> OneSixInstance::createLaunchTask(AuthSessionPtr session)
 {
-	QString launchScript;
-	QIcon icon = ENV.icons()->getIcon(iconKey());
-	auto pixmap = icon.pixmap(128, 128);
-	pixmap.save(FS::PathCombine(minecraftRoot(), "icon.png"), "PNG");
-
 	if (!m_version)
 		return nullptr;
 
-	for(auto & mod: loaderModList()->allMods())
-	{
-		if(!mod.enabled())
-			continue;
-		if(mod.type() == Mod::MOD_FOLDER)
-			continue;
-		// TODO: proper implementation would need to descend into folders.
+#ifdef Q_OS_MAC
+	QIcon icon = ENV.icons()->getIcon(iconKey());
+	auto pixmap = icon.pixmap(128, 128);
+	pixmap.save(FS::PathCombine(minecraftRoot(), "icon.png"), "PNG");
+#endif
 
-		launchScript += "mod " + mod.filename().completeBaseName()  + "\n";;
-	}
+	auto folderPath = FS::PathCombine(instanceRoot(), "natives/");
+	QDir natives_dir(folderPath);
 
-	for(auto & coremod: coreModList()->allMods())
+	// extract native libraries (mostly LWJGL)
 	{
-		if(!coremod.enabled())
-			continue;
-		if(coremod.type() == Mod::MOD_FOLDER)
-			continue;
-		// TODO: proper implementation would need to descend into folders.
-
-		launchScript += "coremod " + coremod.filename().completeBaseName()  + "\n";;
-	}
-
-	for(auto & jarmod: m_version->jarMods)
-	{
-		launchScript += "jarmod " + jarmod->originalName + " (" + jarmod->name + ")\n";
-	}
-
-	// libraries and class path.
-	{
-		auto libs = m_version->getActiveNormalLibs();
-		for (auto lib : libs)
-		{
-			launchScript += "cp " + QFileInfo(lib->storagePath()).absoluteFilePath() + "\n";
-		}
-		auto jarMods = getJarMods();
-		if (!jarMods.isEmpty())
-		{
-			launchScript += "cp " + QDir(instanceRoot()).absoluteFilePath("minecraft.jar") + "\n";
-		}
-		else
-		{
-			QString relpath = m_version->id + "/" + m_version->id + ".jar";
-			launchScript += "cp " + versionsPath().absoluteFilePath(relpath) + "\n";
-		}
-	}
-	if (!m_version->mainClass.isEmpty())
-	{
-		launchScript += "mainClass " + m_version->mainClass + "\n";
-	}
-	if (!m_version->appletClass.isEmpty())
-	{
-		launchScript += "appletClass " + m_version->appletClass + "\n";
-	}
-
-	// generic minecraft params
-	for (auto param : processMinecraftArgs(session))
-	{
-		launchScript += "param " + param + "\n";
-	}
-
-	// window size, title and state, legacy
-	{
-		QString windowParams;
-		if (settings()->get("LaunchMaximized").toBool())
-			windowParams = "max";
-		else
-			windowParams = QString("%1x%2")
-							   .arg(settings()->get("MinecraftWinWidth").toInt())
-							   .arg(settings()->get("MinecraftWinHeight").toInt());
-		launchScript += "windowTitle " + windowTitle() + "\n";
-		launchScript += "windowParams " + windowParams + "\n";
-	}
-
-	// legacy auth
-	{
-		launchScript += "userName " + session->player_name + "\n";
-		launchScript += "sessionId " + session->session + "\n";
-	}
-
-	// native libraries (mostly LWJGL)
-	{
-		QDir natives_dir(FS::PathCombine(instanceRoot(), "natives/"));
+		//FIXME: catch errors or move out of here
+		FS::ensureFolderPathExists(folderPath);
 		for (auto native : m_version->getActiveNativeLibs())
 		{
 			QFileInfo finfo(native->storagePath());
-			launchScript += "ext " + finfo.absoluteFilePath() + "\n";
+			//FIXME: catch errors or move out of here
+			MMCZip::extractDir(finfo.absoluteFilePath(), natives_dir.absolutePath());
 		}
-		launchScript += "natives " + natives_dir.absolutePath() + "\n";
 	}
-
-	// traits. including legacyLaunch and others ;)
-	for (auto trait : m_version->traits)
-	{
-		launchScript += "traits " + trait + "\n";
-	}
-	launchScript += "launcher onesix\n";
 
 	auto process = LaunchTask::create(std::dynamic_pointer_cast<MinecraftInstance>(getSharedPtr()));
 	auto pptr = process.get();
 
 	// print a header
 	{
-		process->appendStep(std::make_shared<TextPrint>(pptr, "Minecraft folder is:\n" + minecraftRoot() + "\n\n", MessageLevel::MultiMC));
+		process->appendStep(std::make_shared<TextPrint>(pptr, "Minecraft folder is:\n  " + minecraftRoot() + "\n\n", MessageLevel::MultiMC));
 	}
 	{
 		auto step = std::make_shared<CheckJava>(pptr);
@@ -271,7 +190,44 @@ std::shared_ptr<LaunchTask> OneSixInstance::createLaunchTask(AuthSessionPtr sess
 	{
 		auto step = std::make_shared<LaunchMinecraft>(pptr);
 		step->setWorkingDirectory(minecraftRoot());
-		step->setLaunchScript(launchScript);
+		// main class
+		step->setMainclass(m_version->mainClass);
+		// libraries and class path.
+		{
+			QStringList classpath;
+			auto libs = m_version->getActiveNormalLibs();
+			for (auto lib : libs)
+			{
+				classpath.push_back(QFileInfo(lib->storagePath()).absoluteFilePath());
+			}
+			auto jarMods = getJarMods();
+			if (!jarMods.isEmpty())
+			{
+				classpath.push_back(QDir(instanceRoot()).absoluteFilePath("minecraft.jar"));
+			}
+			else
+			{
+				classpath.push_back(versionsPath().absoluteFilePath(m_version->id + "/" + m_version->id + ".jar"));
+			}
+			step->setClasspath(classpath);
+		}
+		// minecraft params
+		{
+			QStringList params = processMinecraftArgs(session);
+			if (settings()->get("LaunchFullscreen").toBool())
+			{
+				params.push_back("--fullscreen");
+			}
+			else
+			{
+				params.push_back("--width");
+				params.push_back(settings()->get("MinecraftWinWidth").toString());
+				params.push_back("--height");
+				params.push_back(settings()->get("MinecraftWinHeight").toString());
+			}
+			step->setParams(params);
+		}
+		step->setNativePath(natives_dir.absolutePath());
 		process->appendStep(step);
 	}
 	// run post-exit command if that's needed

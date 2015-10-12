@@ -485,7 +485,7 @@ void MultiMC::initGlobalSettings(bool test_mode)
 	//	m_settings->registerSetting("StdErrColor", QColor(Qt::red));
 
 	// Window Size
-	m_settings->registerSetting({"LaunchMaximized", "MCWindowMaximize"}, false);
+	m_settings->registerSetting("LaunchFullscreen", false);
 	m_settings->registerSetting({"MinecraftWinWidth", "MCWindowWidth"}, 854);
 	m_settings->registerSetting({"MinecraftWinHeight", "MCWindowHeight"}, 480);
 

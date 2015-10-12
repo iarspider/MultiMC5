@@ -127,10 +127,6 @@ void MinecraftVersion::applyTo(MinecraftProfile *version)
 	{
 		version->mainClass = m_mainClass;
 	}
-	if (!m_appletClass.isNull())
-	{
-		version->appletClass = m_appletClass;
-	}
 	if (!m_processArguments.isNull())
 	{
 		version->vanillaProcessArguments = m_processArguments;

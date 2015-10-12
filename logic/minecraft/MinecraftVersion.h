@@ -97,9 +97,6 @@ public: /* data */
 	/// The main class this version uses (if any, can be empty).
 	QString m_mainClass;
 
-	/// The applet class this version uses (if any, can be empty).
-	QString m_appletClass;
-
 	/// The process arguments used by this version
 	QString m_processArguments;
 

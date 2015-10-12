@@ -59,7 +59,7 @@ void MinecraftPage::applySettings()
 	auto s = MMC->settings();
 
 	// Window Size
-	s->set("LaunchMaximized", ui->maximizedCheckBox->isChecked());
+	s->set("LaunchFullscreen", ui->maximizedCheckBox->isChecked());
 	s->set("MinecraftWinWidth", ui->windowWidthSpinBox->value());
 	s->set("MinecraftWinHeight", ui->windowHeightSpinBox->value());
 }
@@ -69,7 +69,7 @@ void MinecraftPage::loadSettings()
 	auto s = MMC->settings();
 
 	// Window Size
-	ui->maximizedCheckBox->setChecked(s->get("LaunchMaximized").toBool());
+	ui->maximizedCheckBox->setChecked(s->get("LaunchFullscreen").toBool());
 	ui->windowWidthSpinBox->setValue(s->get("MinecraftWinWidth").toInt());
 	ui->windowHeightSpinBox->setValue(s->get("MinecraftWinHeight").toInt());
 }

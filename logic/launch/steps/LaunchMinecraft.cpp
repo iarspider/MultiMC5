@@ -38,7 +38,42 @@ void LaunchMinecraft::executeTask()
 	}
 
 	QString allArgs = args.join(", ");
-	emit logLine("Java Arguments:\n[" + m_parent->censorPrivateInfo(allArgs) + "]\n\n", MessageLevel::MultiMC);
+	emit logLine("Java Arguments:\n  [" + m_parent->censorPrivateInfo(allArgs) + "]\n\n", MessageLevel::MultiMC);
+
+	if(m_classpath.size())
+	{
+		emit logLine("Libraries:", MessageLevel::MultiMC);
+		for(auto & lib: m_classpath)
+		{
+			QFileInfo f(lib);
+			QString niceLib = FS::NormalizePath(lib);
+			if (f.exists())
+			{
+				emit logLine(QString("  %1").arg(niceLib), MessageLevel::MultiMC);
+			}
+			else
+			{
+				emit logLine(QString("  %1 (missing)").arg(niceLib), MessageLevel::Warning);
+			}
+		}
+		args.push_back("-cp");
+#ifdef Q_OS_WIN
+		args.push_back(m_classpath.join(";"));
+#else
+		args.push_back(m_classpath.join(":"));
+#endif
+	}
+	emit logLine(QString(), MessageLevel::MultiMC);
+
+	emit logLine(QString("Native path:\n  %1\n\n").arg(m_nativePath), MessageLevel::MultiMC);
+	args.push_back(QString("-Djava.library.path=%1").arg(m_nativePath));
+
+	emit logLine(QString("Main class:\n   %1\n\n").arg(m_mainclass), MessageLevel::MultiMC);
+	args.push_back(m_mainclass);
+
+	QString allParams = m_params.join(", ");
+	emit logLine("Params:\n  [" + m_parent->censorPrivateInfo(allParams) + "]\n\n", MessageLevel::MultiMC);
+	args.append(m_params);
 
 	auto javaPath = FS::ResolveExecutable(instance->settings()->get("JavaPath").toString());
 
@@ -55,7 +90,7 @@ void LaunchMinecraft::executeTask()
 			emitFailed(reason);
 			return;
 		}
-		emit logLine("Wrapper command is:\n" + wrapperCommand + "\n\n", MessageLevel::MultiMC);
+		emit logLine("Wrapper command is:\n  " + wrapperCommand + "\n\n", MessageLevel::MultiMC);
 		args.prepend(javaPath);
 		m_process.start(wrapperCommand, args);
 	}
@@ -99,9 +134,6 @@ void LaunchMinecraft::on_state(LoggedProcess::State state)
 			emit logLine(tr("Minecraft process ID: %1\n\n").arg(m_process.processId()), MessageLevel::MultiMC);
 			m_parent->setPid(m_process.processId());
 			m_parent->instance()->setLastLaunch();
-			// send the launch script to the launcher part
-			m_process.write(m_launchScript.toUtf8());
-
 			mayProceed = true;
 			emit readyForLaunch();
 			break;
