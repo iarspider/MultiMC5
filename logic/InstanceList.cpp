@@ -35,7 +35,6 @@
 #include "minecraft/LegacyInstance.h"
 #include "minecraft/MinecraftVersion.h"
 #include "settings/INISettingsObject.h"
-#include "ftb/FTBPlugin.h"
 #include "NullInstance.h"
 #include "FileSystem.h"
 #include "pathmatcher/RegexpMatcher.h"
@@ -303,9 +302,6 @@ InstanceList::InstListError InstanceList::loadList()
 			tempList.append(instPtr);
 		}
 	}
-
-	// FIXME: generalize
-	FTBPlugin::loadInstances(m_globalSettings, groupMap, tempList);
 
 	beginResetModel();
 	m_instances.clear();

@@ -208,16 +208,6 @@ set(LOGIC_SOURCES
 	minecraft/WorldList.h
 	minecraft/WorldList.cpp
 
-	# FTB
-	ftb/OneSixFTBInstance.h
-	ftb/OneSixFTBInstance.cpp
-	ftb/LegacyFTBInstance.h
-	ftb/LegacyFTBInstance.cpp
-	ftb/FTBProfileStrategy.h
-	ftb/FTBProfileStrategy.cpp
-	ftb/FTBPlugin.h
-	ftb/FTBPlugin.cpp
-
 	# A Recursive file system watcher
 	RecursiveFileSystemWatcher.h
 	RecursiveFileSystemWatcher.cpp
