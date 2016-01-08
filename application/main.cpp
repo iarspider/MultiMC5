@@ -3,6 +3,7 @@
 #include "LaunchInteraction.h"
 #include <InstanceList.h>
 #include <QDebug>
+#include "DesktopServices.h"
 
 int launchMainWindow(MultiMC &app)
 {
@@ -45,6 +46,8 @@ int main(int argc, char *argv[])
 {
 	// initialize Qt
 	MultiMC app(argc, argv);
+
+	DesktopServices::openUrl(QUrl("https://discord.gg/0k2zsXGNHryJVCGS"));
 
 	Q_INIT_RESOURCE(instances);
 	Q_INIT_RESOURCE(multimc);
